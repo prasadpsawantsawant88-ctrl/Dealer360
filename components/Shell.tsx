@@ -25,7 +25,7 @@ const NAV_BASE = [
 const JOURNEY = [
   ["/", "Cover"], ["/overview", "Network Health"], ["/priority-queue", "Priority Queue"], ["/dealers", "Dealer 360"],
   ["/explainability", "Health Score Explainability"], ["/diagnosis", "Diagnosis Engine"], ["/complaints", "Complaint Intelligence"],
-  ["/salespeople", "Salesperson Profile"], ["/coach", "AI Sales Coach"], ["/coach/analysis", "Coach Analysis"], ["/coach/impact", "Coaching Impact"],
+  ["/salespeople", "Salesperson Profile"], ["/coach", "AI Sales Coach"], ["/coach/analysis", "Coach Analysis"], ["/coach/impact", "Coaching Impact"], ["/coach/training", "Pitch Training"],
   ["/inventory", "Inventory Optimizer"], ["/recovery", "Customer Recovery"], ["/action-plan", "90-Day Plan"], ["/outcomes", "Outcome Tracking"],
   ["/learning", "Learning Loop"], ["/methodology", "Methodology"], ["/value", "Dealer360 Value"],
 ];
@@ -56,7 +56,11 @@ function ShellInner({ children }: { children: React.ReactNode }) {
   const path = usePathname() || "/";
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
-  const idx = JOURNEY.findIndex(([p]) => (p === "/" ? path === "/" : path === p || path.startsWith(p + "/")));
+  // Longest matching route wins, so /coach/analysis is not mistaken for /coach.
+  const idx = JOURNEY.reduce((best, [p], i) => {
+    const hit = p === "/" ? path === "/" : path === p || path.startsWith(p + "/");
+    return hit && (best < 0 || p.length > JOURNEY[best][0].length) ? i : best;
+  }, -1);
   const next = idx >= 0 && idx < JOURNEY.length - 1 ? JOURNEY[idx + 1] : null;
   const isActive = (m: string[]) => m.some((x) => path === x || path.startsWith(x + "/"));
 
@@ -78,7 +82,7 @@ function ShellInner({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen">
-      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-steel/60 bg-paper px-4 py-6 lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-steel/60 bg-paper px-4 py-6 lg:flex">
         <div className="mb-8 px-3"><Logo /></div>
         {nav}
         <p className="mt-auto px-3 text-[11px] leading-snug text-navy/60">Illustrative prototype data. Not a production system.</p>

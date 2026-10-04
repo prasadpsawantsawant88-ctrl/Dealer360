@@ -10,6 +10,7 @@
     "generate-data": "tsx scripts/generate-data.ts"
   },
   "dependencies": {
+    "jspdf": "^4.2.1",
     "lucide-react": "^0.460.0",
     "next": "^15.1.0",
     "react": "^19.0.0",

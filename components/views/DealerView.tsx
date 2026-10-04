@@ -2,39 +2,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Download, Loader2 } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend } from "recharts";
 import { Page, Panel, Source, Callout, Modal, StatusBadge, ChartTip, chartAxis } from "@/components/ui";
 import { C } from "@/lib/theme";
 import { aggregates, dealers, getDealer, DIM_LABELS, median, modelOutputs } from "@/lib/data";
 import { useCountUp } from "@/hooks/useCountUp";
 import { useSelection } from "@/components/Selection";
-
-const DETAIL: Record<string, { label: string; get: (d: any) => number; fmt: (v: number) => string; lowerBetter?: boolean }[]> = {
-  sales: [
-    { label: "Conversion rate", get: (d) => d.kpis.conversionPct, fmt: (v) => `${v.toFixed(1)}%` },
-    { label: "Units per month", get: (d) => d.unitsPerMonth, fmt: (v) => `${Math.round(v)}` },
-    { label: "Sales growth YoY", get: (d) => d.kpis.salesGrowthPct, fmt: (v) => `${v.toFixed(1)}%` },
-  ],
-  csat: [
-    { label: "CSI score", get: (d) => d.kpis.csi, fmt: (v) => v.toFixed(1) },
-    { label: "Complaints per 100 sales", get: (d) => d.kpis.complaintsPer100, fmt: (v) => v.toFixed(1), lowerBetter: true },
-    { label: "Avg resolution (days)", get: (d) => d.kpis.resolutionDays, fmt: (v) => v.toFixed(1), lowerBetter: true },
-  ],
-  inventory: [
-    { label: "Stock aged 90+ days", get: (d) => d.kpis.inventoryOver90Pct, fmt: (v) => `${v.toFixed(1)}%`, lowerBetter: true },
-    { label: "Avg days to sale", get: (d) => d.kpis.avgDaysToSale, fmt: (v) => `${Math.round(v)}`, lowerBetter: true },
-  ],
-  service: [
-    { label: "Service revenue index", get: (d) => d.kpis.serviceRevenueIndex, fmt: (v) => `${Math.round(v)}` },
-    { label: "Days sales outstanding", get: (d) => d.kpis.dsoDays, fmt: (v) => `${Math.round(v)}`, lowerBetter: true },
-    { label: "Margin", get: (d) => d.kpis.marginPct, fmt: (v) => `${v.toFixed(1)}%` },
-    { label: "Payment delay (days)", get: (d) => d.kpis.paymentDelayDays, fmt: (v) => v.toFixed(1), lowerBetter: true },
-  ],
-  compliance: [
-    { label: "Training hours per person", get: (d) => d.kpis.trainingHours, fmt: (v) => v.toFixed(0) },
-    { label: "Avg competency score", get: (d) => d.kpis.avgCompetency, fmt: (v) => v.toFixed(1) },
-  ],
-};
+import { DETAIL } from "@/lib/kpis";
 
 export function DealerView({ id }: { id: string }) {
   const d = getDealer(id);
@@ -44,6 +19,18 @@ export function DealerView({ id }: { id: string }) {
   }, [d.id]);
   const [dim, setDim] = useState<string>("csat");
   const [explain, setExplain] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState("");
+  const downloadReport = async () => {
+    setExporting(true); setExportError("");
+    try {
+      const { downloadDealerReport } = await import("@/lib/dealerReport");
+      await downloadDealerReport(d.id);
+    } catch (e) {
+      console.error(e);
+      setExportError("Could not create the report. Please try again.");
+    } finally { setExporting(false); }
+  };
   const score = useCountUp(d.health);
   const peers = dealers.filter((x) => x.region === d.region);
   const dimData = (Object.keys(DIM_LABELS) as string[]).map((k) => ({ key: k, name: k === "inventory" ? "Inventory Health" : DIM_LABELS[k], value: (d.dims as any)[k], regional: Math.round(median(peers.map((p) => (p.dims as any)[k]))) }));
@@ -72,7 +59,12 @@ export function DealerView({ id }: { id: string }) {
             <div className="flex flex-wrap gap-3 pt-2">
               <Link href="/diagnosis" className="rounded-sm bg-navy px-4 py-2 text-sm text-white hover:bg-ink">Open diagnosis</Link>
               <button onClick={() => setExplain(true)} className="rounded-sm border border-navy px-4 py-2 text-sm text-navy hover:bg-white">How is this score built?</button>
+              <button onClick={downloadReport} disabled={exporting} aria-busy={exporting} className="inline-flex items-center gap-2 rounded-sm border border-navy px-4 py-2 text-sm text-navy hover:bg-white disabled:cursor-wait disabled:opacity-60">
+                {exporting ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
+                {exporting ? "Preparing PDF..." : "Download report"}
+              </button>
             </div>
+            {exportError && <p role="alert" className="text-xs text-alert">{exportError}</p>}
             <label className="block text-xs text-navy/70">
               Switch dealer
               <select className="mt-1 block w-full max-w-xs rounded-sm border border-steel bg-white px-2 py-2 text-sm text-navy" value={d.id} onChange={(e) => router.push(`/dealers/${e.target.value}`)}>

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const TABS = [["/coach", "Scenario"], ["/coach/analysis", "Analysis"], ["/coach/impact", "Impact"]];
+const TABS = [["/coach", "Scenario"], ["/coach/analysis", "Analysis"], ["/coach/impact", "Impact"], ["/coach/training", "Pitch training"]];
 
 export function CoachTabs() {
   const p = usePathname();

@@ -1,375 +1,50 @@
-# Dealer360
+# Dealer360 — Enterprise Dealer Performance Platform
 
-### Dealer Health & Performance Intelligence Platform
+**From Signal to Improvement. Every Time.** An interactive Next.js prototype built from the Dealer360 Product Walkthrough PDF. Operating model: SENSE → ASSESS → DIAGNOSE → PRIORITISE → ACT → MEASURE → LEARN.
 
-Dealer360 is a data-driven dealer analytics prototype designed to help organizations monitor dealer performance, identify early warning signals, and prioritize actionable interventions.
+## Business problem
+Dealer sales numbers alone hide the causes of decline. Dealer360 joins health scoring, risk prediction, root-cause diagnosis, salesperson coaching, inventory and customer recovery into one workflow, then measures whether the intervention worked and learns from it.
 
-The platform brings together dealer-level KPIs, health indicators, performance trends, risk signals, and actionable insights into a single interactive dashboard.
+## Architecture
+Data → Health → Risk → Diagnosis → Intervention → Outcome → Learning
 
----
+## Tech stack
+Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS 3, Recharts, Lucide React. Local simulated JSON only: no database and no required environment variables. `jspdf` builds the dealer PDF reports in the browser.
 
-## 🚀 Overview
-
-Managing a large dealer network requires more than monitoring sales numbers. Dealer performance can deteriorate due to declining sales, inventory issues, customer activity, financial stress, or operational challenges.
-
-**Dealer360** provides a consolidated view of dealer health by combining multiple performance indicators into an intuitive analytics interface.
-
-The prototype is designed to answer key business questions:
-
-- Which dealers are performing well?
-- Which dealers require immediate attention?
-- What factors are driving dealer health?
-- Which dealers are showing early signs of deterioration?
-- Where should management prioritize intervention?
-- How can dealer performance be monitored over time?
-
----
-
-## 🎯 Key Features
-
-### 1. Dealer Health Dashboard
-
-Provides a consolidated overview of the dealer network through key performance indicators and visual analytics.
-
-Key metrics include:
-
-- Overall dealer health
-- Sales performance
-- Growth trends
-- Inventory indicators
-- Customer activity
-- Risk indicators
-- Dealer segmentation
-
-### 2. Dealer Performance Analysis
-
-Analyze individual dealer performance using historical and current-period metrics.
-
-Users can identify:
-
-- High-performing dealers
-- Underperforming dealers
-- Improving dealers
-- Declining dealers
-- Dealers requiring intervention
-
-### 3. Dealer Health Score
-
-Dealer360 uses multiple business indicators to provide a consolidated view of dealer health.
-
-The health assessment can incorporate factors such as:
-
-- Sales performance
-- Sales growth
-- Inventory position
-- Customer activity
-- Revenue contribution
-- Performance trends
-- Risk indicators
-
-### 4. Risk & Early-Warning Signals
-
-The platform helps identify dealers that may require attention before performance deteriorates significantly.
-
-Potential signals include:
-
-- Declining sales
-- Negative growth
-- Low inventory movement
-- Reduced customer activity
-- Persistent underperformance
-- Deteriorating health scores
-
-### 5. Dealer-Level Drill Down
-
-Users can move from the overall network view to individual dealer-level analysis to understand the underlying drivers of performance.
-
-### 6. Interactive Visual Analytics
-
-The prototype uses interactive charts, KPI cards, tables, filters, and visual indicators to make dealer performance easier to understand and act upon.
-
----
-
-## 🏗️ Solution Architecture
-
-```text
-Dealer Data
-     │
-     ▼
-Data Processing & Transformation
-     │
-     ▼
-KPI & Health Metric Calculation
-     │
-     ▼
-Dealer Health / Risk Assessment
-     │
-     ▼
-Dealer360 Analytics Dashboard
-     │
-     ├── Network Overview
-     ├── Dealer Performance
-     ├── Health Analysis
-     ├── Risk Signals
-     └── Dealer Drill-down
-```
-
----
-
-## 📊 Analytics Framework
-
-Dealer360 follows a structured analytics approach:
-
-### Descriptive Analytics
-
-Answers:
-
-> What is happening?
-
-Examples:
-
-- Dealer sales
-- Revenue
-- Growth
-- Inventory
-- Customer activity
-
-### Diagnostic Analytics
-
-Answers:
-
-> Why is it happening?
-
-Examples:
-
-- Identifying drivers of declining performance
-- Comparing dealer performance
-- Detecting unusual trends
-- Understanding KPI deterioration
-
-### Predictive / Early-Warning Analytics
-
-Answers:
-
-> What could happen next?
-
-Examples:
-
-- Identifying dealers at risk
-- Detecting declining trends
-- Highlighting potential performance deterioration
-
-### Prescriptive Analytics
-
-Answers:
-
-> What should we do?
-
-Examples:
-
-- Prioritize dealers for intervention
-- Recommend follow-up actions
-- Focus management attention on high-risk dealers
-
----
-
-## 🖥️ Technology Stack
-
-The project is designed as a modern web-based analytics prototype.
-
-Typical components include:
-
-| Layer | Technology |
-|---|---|
-| Frontend | React / JavaScript |
-| Styling | CSS |
-| Data Processing | JavaScript / Application Logic |
-| Visualization | Interactive charting libraries |
-| Data | Local project data files |
-| Version Control | Git & GitHub |
-| Deployment | Vercel |
-
-> The exact technologies may vary depending on the implementation contained in the repository.
-
----
-
-## 📁 Project Structure
-
-```text
-Dealer360/
-│
-├── public/
-│   └── Static assets and application resources
-│
-├── src/
-│   ├── Components
-│   ├── Pages
-│   ├── Data
-│   └── Application logic
-│
-├── data/
-│   └── Dealer datasets
-│
-├── package.json
-├── README.md
-└── ...
-```
-
-> Project structure may evolve as additional functionality is added.
-
----
-
-## ⚙️ Getting Started
-
-### Prerequisites
-
-Make sure the following are installed:
-
-- Node.js
-- npm
-- Git
-
-Check the installations:
-
-```bash
-node --version
-npm --version
-git --version
-```
-
----
-
-## 💻 Local Installation
-
-Clone the repository:
-
-```bash
-git clone https://github.com/prasadpsawantsawant88-ctrl/Dealer360.git
-```
-
-Navigate to the project:
-
-```bash
-cd Dealer360
-```
-
-Install dependencies:
-
+## Run
 ```bash
 npm install
+npm run dev        # http://localhost:3000
+npm run build && npm start
 ```
 
-Start the development server:
+## Dealer PDF report
+On any Dealer 360 page, **Download report** builds a multi-page PDF for that dealer in the browser: health score and trend, dimension scores against the regional median, KPI table, score contributions, diagnosis chain, complaint summary, sales team, inventory ageing and the 90-day plan. Dealers on Monitor status have no diagnosis or plan, so those sections show a short note instead. Code: `lib/dealerReport.ts`.
 
-```bash
-npm run dev
-```
+## Pitch training (AI Sales Coach)
+`/coach/training` lets a salesperson record a spoken reply to a customer scenario. The browser records the audio (MediaRecorder) and turns speech into text (Web Speech API, Chrome and Edge). The text can be edited, then scored in the browser by `lib/pitchAnalysis.ts` on the five coaching objectives, with pace, filler words, a checklist and the first things to fix, each with a sample line from the practice scenarios. Browsers without speech-to-text can record and type the transcript, or skip recording and type the pitch.
 
-The application should then be available through the local development URL shown in the terminal.
+Optional written coaching from Claude: copy `.env.example` to `.env.local`, set `ANTHROPIC_API_KEY`, restart. The page then also shows a summary, concrete improvements, a rewritten pitch and a practice drill from `app/api/pitch-feedback/route.ts`. Only the transcript text is sent, never the audio. Without a key that panel says it is switched on by key and everything else works. Microphone access needs `localhost` or HTTPS.
 
----
+## Deploy to Vercel
+1. Push the folder to a Git repository (or run `npx vercel` in this folder).
+2. Import the project at vercel.com/new. Framework preset: Next.js (auto-detected).
+3. Keep default build settings and deploy. No environment variables are needed; add `ANTHROPIC_API_KEY` only if you want the written coaching on Pitch Training.
 
-## 🌐 Deployment
+## Folder structure
+`app/` routes · `components/` shell, UI primitives, views · `lib/` data access, theme, coach script, keyword classifier · `hooks/` · `data/` JSON + `data_dictionary.md` · `scripts/generate-data.ts` seeded generator (`npm run generate-data`).
 
-Dealer360 is designed to be deployed using Vercel.
+## Data architecture
+All numbers come from a seeded simulation (`npm run generate-data`), not from the source PDF. 150 dealers, about 540 salespeople, about 4,400 complaints, 2,400 stock rows and 600 intervention cases; see `data/data_dictionary.md` for how the pieces connect.
 
-The deployment workflow is:
+## ML simulation
+Health-score weights are fitted by regression on simulated history (with bootstrap confidence ranges), deterioration risk comes from a logistic regression, recovery funnels come from simulated case workflows, and the 90-day outcome uses difference-in-differences against simulated control dealers. These are real calculations on **simulated** inputs, so they illustrate the method but say nothing about real dealers. The complaint classifier is a keyword scorer; Inventory Optimizer scenario effects are simple elasticities.
 
-```text
-Local Development
-       │
-       ▼
-     Git
-       │
-       ▼
-    GitHub
-       │
-       ▼
-     Vercel
-       │
-       ▼
-Production Application
-```
+## Demo walkthrough (5–7 minutes)
+Use the "Next" button at the bottom right of every page.
+Network (Overview) → Priority Queue → ABC Motors (Dealer 360, the top-ranked dealer with a flagged salesperson) → Explainability → Diagnosis → Complaints → Rahul Sharma → AI Sales Coach (click START PRACTICE, pick replies) → Coach Analysis (your session overlays the recorded pitch) → Coaching Impact → Pitch Training (record or type a pitch) → Inventory scenarios → Action Plan (drag the day slider) → Outcomes → Learning Loop.
 
-Once the GitHub repository is connected to Vercel, new commits pushed to the `main` branch can automatically trigger a new deployment.
-
----
-
-## 🔄 Updating the Application
-
-After making changes locally:
-
-```bash
-git add .
-git commit -m "Update Dealer360"
-git push origin main
-```
-
-If the GitHub repository is connected to Vercel, the updated version can then be automatically deployed.
-
----
-
-## 🔐 Data & Security
-
-This repository is intended for prototype and demonstration purposes.
-
-Before using Dealer360 with production or confidential business data:
-
-- Remove sensitive information
-- Avoid committing credentials or API keys
-- Use environment variables for secrets
-- Review access permissions
-- Apply appropriate data privacy controls
-- Ensure compliance with organizational data policies
-
-Do not commit `.env` files or other credentials to the repository.
-
----
-
-## 📌 Project Status
-
-**Status:** Prototype / Proof of Concept
-
-Dealer360 is currently being developed as an analytics prototype demonstrating how dealer performance and dealer-health intelligence can be presented through an interactive digital platform.
-
----
-
-## 🔮 Future Scope
-
-Potential future enhancements include:
-
-- Automated data ingestion
-- Real-time dealer performance monitoring
-- Predictive dealer-risk models
-- Automated alerts and notifications
-- AI-powered dealer recommendations
-- Advanced dealer segmentation
-- Role-based access control
-- Historical trend analysis
-- Integration with CRM / ERP systems
-- Automated management reports
-- Cloud database integration
-- Production-grade authentication and security
-
----
-
-## 🎓 Project Context
-
-Dealer360 was developed as a business analytics and digital analytics prototype to demonstrate the application of data analytics, visualization, business intelligence, and decision-support concepts to dealer network management.
-
----
-
-## 👤 Author
-
-**Prasad Sawant**
-
-MBA – Business Analytics  
-NMIMS School of Business Management
-
----
-
-## 📄 License
-
-This project is currently intended for academic, prototype, and demonstration purposes.
-
-All rights reserved unless otherwise specified.
+## Notes
+- The dealer picker on each page switches between queued dealers; the choice carries across pages.
+- Fonts load from Google Fonts at runtime (Poppins, Inter) with system fallbacks.
+- Contact details on the Methodology page come from the source walkthrough and are placeholders.
